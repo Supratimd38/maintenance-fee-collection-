@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Error</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="alert alert-danger shadow">
+                <h4 class="alert-heading mb-3">Something went wrong</h4>
+
+                <!-- server-side message, if any -->
+                <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
+                <p th:unless="${errorMessage}">
+                    We were unable to process your payment request.  
+                    Please try again later or contact the administrator.
+                </p>
+
+                <a href="/payments" class="btn btn-primary mt-3">Back to Payments</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

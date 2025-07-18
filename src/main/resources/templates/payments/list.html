@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Payments | Society Management</title>
+
+    <!-- Bootstrap & icons via WebJars -->
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body { background:#f8f9fa; }
+    </style>
+</head>
+<body>
+
+<!-- ─── Navigation bar ────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">Society Mgmt</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/flat-owners">Flat Owners</a></li>
+                <li class="nav-item"><a class="nav-link active" href="/payments">Payments</a></li>
+            </ul>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button class="btn btn-outline-light btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- ─── Page body ─────────────────────────────────────────── -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Maintenance Payments</h3>
+
+        <!-- Generate-bills modal trigger -->
+        <button class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#generateModal">
+            <i class="bi bi-plus-circle"></i> Generate Bills
+        </button>
+    </div>
+
+    <!-- ── Payments table ── -->
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-secondary">
+            <tr>
+                <th>#</th>
+                <th>Owner</th>
+                <th>Flat No.</th>
+                <th>Month / Year</th>
+                <th>Amount (₹)</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th style="width:160px">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment, iter : ${payments}">
+                <td th:text="${iter.count}">1</td>
+                <td th:text="${payment.flatOwner.name}">John Doe</td>
+                <td th:text="${payment.flatOwner.flatNumber}">A-101</td>
+                <td th:text="|${payment.paymentMonth}/${payment.paymentYear}|">7/2025</td>
+                <td th:text="${#numbers.formatDecimal(payment.amount,0,'COMMA',2,'POINT')}">2 500.00</td>
+                <td th:text="${#temporals.format(payment.dueDate,'dd-MMM-yyyy')}">10-Jul-2025</td>
+
+                <!-- Status badge (fixed expression) -->
+                <td>
+                    <span class="badge"
+                          th:classappend="${payment.paymentStatus.name() == 'PAID'    ? ' bg-success' :
+                                           payment.paymentStatus.name() == 'PENDING' ? ' bg-warning text-dark' :
+                                           payment.paymentStatus.name() == 'OVERDUE' ? ' bg-danger' :
+                                           ' bg-dark'}"
+                          th:text="${payment.paymentStatus}">PENDING</span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                    <a th:href="@{|/payments/bill/${payment.id}|}"
+                       class="btn btn-outline-primary btn-sm mb-1">
+                        <i class="bi bi-filetype-pdf"></i> PDF
+                    </a>
+
+                    <a th:if="${payment.paymentStatus.name() != 'PAID'}"
+                       th:href="@{|/payment/pay/${payment.id}|}"
+                       class="btn btn-outline-success btn-sm mb-1">
+                        <i class="bi bi-credit-card"></i> Pay Now
+                    </a>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(payments)}">
+                <td colspan="8" class="text-center text-muted py-4">
+                    <em>No payment records found</em>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ─── Generate Bills Modal ─────────────────────────────── -->
+<div class="modal fade" id="generateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content"
+              th:action="@{/payments/generate/__month__/__year__}"
+              method="get"
+              onsubmit="return replaceActionAndSubmit(this)">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Generate Monthly Bills</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="form-label">Month (1-12)</label>
+                        <input name="month" type="number" min="1" max="12" class="form-control" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Year</label>
+                        <input name="year" type="number" min="2020" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-text mt-2">
+                    Creates a <em>PENDING</em> payment for each active flat-owner
+                    that doesn’t already have one for the chosen month.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-check-circle"></i> Generate
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ─── Scripts ───────────────────────────────────────────── -->
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    /* Build /payments/generate/{month}/{year} on the fly */
+    function replaceActionAndSubmit(frm) {
+        const m = frm.month.value.trim();
+        const y = frm.year.value.trim();
+        if (!m || !y) return false;
+        frm.action = `/payments/generate/${m}/${y}`;
+        return true;
+    }
+</script>
+</body>
+</html>

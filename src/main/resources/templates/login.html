@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Society Management</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Sign in</h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- show error or logout message -->
+                    <div th:if="${param.error}" class="alert alert-danger py-1">
+                        Bad credentials
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success py-1">
+                        You have been logged out
+                    </div>
+
+                    <!-- Spring Security default login-processing-url is /login POST -->
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input id="username" name="username" class="form-control" autofocus>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input id="password" type="password" name="password" class="form-control">
+                        </div>
+
+                        <!-- CSRF token -->
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+
+                        <button type="submit" class="btn btn-primary w-100">Log in</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
