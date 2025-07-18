@@ -1,65 +1,134 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Maintenance Fee Collection</title>
-    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | Society Management</title>
+
+  <!-- Bootstrap & Bootstrap Icons via WebJars -->
+  <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/webjars/bootstrap-icons/1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #f0f4f8, #fff);
+      min-height: 100vh;
+    }
+    .dashboard-card {
+      border: none;
+      border-radius: 0.5rem;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 1rem rgba(0,0,0,0.05);
+    }
+    .dashboard-card:hover {
+      transform: translateY(-4px);
+    }
+    .stat-icon {
+      font-size: 2.5rem;
+      opacity: 0.2;
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/dashboard">Society Management</a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/dashboard">Dashboard</a>
-                <a class="nav-link" href="/flat-owners">Flat Owners</a>
-                <a class="nav-link" href="/payments">Payments</a>
-                <form th:action="@{/logout}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-light">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container mt-4">
-        <h2>Dashboard</h2>
-        
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card text-white bg-primary">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Flat Owners</h5>
-                        <h3 th:text="${totalFlatOwners}">0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-success">
-                    <div class="card-body">
-                        <h5 class="card-title">Paid Payments</h5>
-                        <h3 th:text="${paidPayments}">0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-warning">
-                    <div class="card-body">
-                        <h5 class="card-title">Pending Payments</h5>
-                        <h3 th:text="${pendingPayments}">0</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-white bg-danger">
-                    <div class="card-body">
-                        <h5 class="card-title">Overdue Payments</h5>
-                        <h3 th:text="${overduePayments}">0</h3>
-                    </div>
-                </div>
-            </div>
+<!-- 🔸 Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/dashboard">Society Management</a>
+    <div class="navbar-nav ms-auto">
+      <a class="nav-link active" href="/dashboard">Dashboard</a>
+      <a class="nav-link" href="/flat-owners">Flat Owners</a>
+      <a class="nav-link" href="/payments">Payments</a>
+      <form th:action="@{/logout}" method="post" class="d-inline">
+        <button class="btn btn-outline-light btn-sm ms-3">Logout</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- 🔸 Container -->
+<div class="container py-5">
+  <h2 class="mb-4 fw-bold text-primary">
+    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+  </h2>
+
+  <!-- 🔹 Statistics Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Total Flat Owners -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card dashboard-card bg-info text-white">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0" th:text="${totalFlatOwners}">0</h4>
+            <small>Total Owners</small>
+          </div>
+          <i class="bi bi-people-fill stat-icon"></i>
         </div>
+      </div>
     </div>
 
-    <script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!-- Paid Payments -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card dashboard-card bg-success text-white">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0" th:text="${paidPayments}">0</h4>
+            <small>Paid Payments</small>
+          </div>
+          <i class="bi bi-check-circle-fill stat-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Payments -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card dashboard-card bg-warning text-dark">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0" th:text="${pendingPayments}">0</h4>
+            <small>Pending Payments</small>
+          </div>
+          <i class="bi bi-hourglass-split stat-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overdue Payments -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card dashboard-card bg-danger text-white">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0" th:text="${overduePayments}">0</h4>
+            <small>Overdue Payments</small>
+          </div>
+          <i class="bi bi-exclamation-triangle stat-icon"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 Quick Actions -->
+  <div class="card p-4 shadow-sm border-0">
+    <h5 class="text-primary mb-3"><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+    <div class="d-flex flex-wrap gap-3">
+      <a href="/flat-owners/add" class="btn btn-outline-primary">
+        <i class="bi bi-person-plus"></i> Add Flat Owner
+      </a>
+      <a th:href="@{'/payments/generate/' + ${#dates.format(#dates.createNow(),'MM')} + '/' + ${#dates.format(#dates.createNow(),'yyyy')}}" 
+         class="btn btn-outline-success">
+        <i class="bi bi-calendar-plus"></i> Generate Bills for This Month
+      </a>
+      <a href="/payments" class="btn btn-outline-info">
+        <i class="bi bi-card-list"></i> View All Payments
+      </a>
+      <a href="/h2-console" target="_blank" class="btn btn-outline-secondary">
+        <i class="bi bi-terminal"></i> H2 DB Console
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
